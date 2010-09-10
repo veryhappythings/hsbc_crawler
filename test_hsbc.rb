@@ -8,5 +8,10 @@ class TestHsbc < Test::Unit::TestCase
     assert_equal(include_any?(str, ['shoes', 'there', 'hell']), true)
     assert_equal(include_any?(str, ['japan', 'france', 'doberman']), false)
   end
+
+  def test_remove_duplicates
+    array = ['first', 'second', 'first', 'third', 'third', 'second']
+    assert_equal(remove_duplicates(array), ['first', 'second', 'third'])
+  end
 end
 
