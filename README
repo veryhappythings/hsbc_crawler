@@ -1,0 +1,9 @@
+A quick, dirty crawler for HSBC's online banking.  They don't offer CSV downloads for everything so I thought I'd do it myself.
+
+To run, just run 'ruby crawl.rb' and it'll ask you for your details. If you want, you can save them to a yaml file instead: the format is explained in hsbc.yml.example.  You can put as many or as few of your details in there as you like. I don't recommend leaving your details on disk, obviously. In fact, you probably shouldn't type them into any software ever.
+
+Only tested on my account.  It might not work for you. Feel free to fork it and send me a pull request.
+
+I wrote this assuming that it was going to be really hard to test, because crawlers often are, so I didn't bother trying to write tests, which I am now regretting, as I really need tests for some refactoring I want to do. I'm really sorry. I promise to try harder in future.
+
+Suggestions for improvement etc to http://www.github.com/veryhappythings/hsbc_crawler
