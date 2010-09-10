@@ -100,22 +100,21 @@ end
 
 ##############
 
-def crawl(config)
-  output = []
-
-  agent = Mechanize.new
-  # homepage
-  puts 'Homepage...'
+def homepage(agent)
   page = agent.get('http://www.hsbc.co.uk')
   page = page.link_with(:text => 'Log on to Personal Internet Banking').click
-  # login
-  puts 'Log in...'
+  page
+end
+
+def log_in(agent, page, config)
   form = page.forms[1]
   form.userid = config['user_id']
   page = agent.submit(form, form.buttons.first)
+  page
+end
+
+def security(agent, page, config)
   processed_security_number = ''
-  # security
-  puts 'Security...'
   page.search('//div[@class="logonPageAlignment"]//span[@class="hsbcTextHighlight"]//strong').each do |s|
     unless s.content == 'date of birth'
       pos = s.content.strip
@@ -126,11 +125,14 @@ def crawl(config)
   form.memorableAnswer = config['date_of_birth']
   form.password = processed_security_number
   page = agent.submit(form)
-  # Javascript disabled page
-  puts 'Javascript disabled page...'
-  page = page.links.find {|l| l.text.include? 'here'}.click
-  # Account selection
-  puts 'Account selection...'
+  page
+end
+
+def javascript_disabled_page(page)
+  page.links.find {|l| l.text.include? 'here'}.click
+end
+
+def account_selection(agent, page, config)
   page.forms.each do |form|
     form.buttons.each do |button|
       if button.name.include? config['account_number']
@@ -141,9 +143,11 @@ def crawl(config)
       end
     end
   end
-  # Recent transactions
-  puts 'Recent Transactions...'
+  page
+end
 
+def recent_transactions(agent, page)
+  output = []
   begin
     process_statement_page(page, output)
     form = page.forms[1]
@@ -151,11 +155,12 @@ def crawl(config)
       page = agent.submit(form, form.buttons.first)
     end
   end while form.field_with(:name => 'fromDateDay').value != ''
+  output
+end
 
+def previous_statements(agent, page)
+  output = []
   page = page.links.find {|l| l.text.include? 'Previous statements'}.click
-
-  #previous statements
-  puts 'Previous statements...'
 
   begin
     page.search('//table[@class="hsbcRowSeparator"]/tbody').each do |table|
@@ -183,8 +188,41 @@ def crawl(config)
   output
 end
 
+def crawl(config)
+  output = []
+
+  agent = Mechanize.new
+  puts 'Homepage...'
+  page = homepage(agent)
+
+  # login
+  puts 'Log in...'
+  page = log_in(agent, page, config)
+
+  # security
+  puts 'Security...'
+  page = security(agent, page, config)
+
+  # Javascript disabled page
+  puts 'Javascript disabled page...'
+  page = javascript_disabled_page(page)
+
+  # Account selection
+  puts 'Account selection...'
+  page = account_selection(agent, page, config)
+
+  # Recent transactions
+  puts 'Recent Transactions...'
+  output += recent_transactions(agent, page)
+
+  #previous statements
+  puts 'Previous statements...'
+  output += previous_statements(agent, page)
+
+  output
+end
+
 def remove_duplicates(input)
-  puts 'Removing duplicates...'
   accepted = Set.new
   [].tap do |arr|
     input.each do |row|
