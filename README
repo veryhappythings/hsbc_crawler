@@ -7,3 +7,6 @@ Only tested on my account.  It might not work for you. Feel free to fork it and 
 I wrote this assuming that it was going to be really hard to test, because crawlers often are, so I didn't bother trying to write tests, which I am now regretting, as I really need tests for some refactoring I want to do. I'm really sorry. I promise to try harder in future.
 
 Suggestions for improvement etc to http://www.github.com/veryhappythings/hsbc_crawler
+
+I offer no guarantees that this code will work and I strongly advise that you don't run this code against your bank account without fully vetting it to ensure that it will do what you think it will do.
+
